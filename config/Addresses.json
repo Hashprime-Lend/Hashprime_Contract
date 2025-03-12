@@ -1,0 +1,182 @@
+[
+  {
+<<<<<<< HEAD
+    "addr": "0x2a18C9E82Fce85209300Fa2a0128B03aDbf8b211",
+    "chainId": 133,
+=======
+    "addr": "0x62276f4466bbB6B9e1D1ebD2aa4119FA3353EAA5",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "RTOKEN_IMPLEMENTATION"
+  },
+  {
+    "addr": "0xa9F58940e1B3B594d770994bC4be396A2e274ebd",
+<<<<<<< HEAD
+    "chainId": 133,
+=======
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "UNITROLLER"
+  },
+  {
+    "addr": "0x9F35661aE98bc9fff21D57575Cb72dB1e2a407e4",
+<<<<<<< HEAD
+    "chainId": 133,
+=======
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "COMPTROLLER"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0xBdD814542Fa279d4Ca65E5F7d8C37Df853A3008F",
+    "chainId": 133,
+=======
+    "addr": "0x588d248B8267Fb019a317A3869780a8FF4b28c0D",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "MRD_PROXY"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x360d54966f0C299f16948748887DB2121AA49906",
+    "chainId": 133,
+=======
+    "addr": "0x256Cc247017dFF951Fd966F13568BCaC4f7cC7F7",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "MRD_IMPL"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0xE6130a31b252F89e2B972a2304934C42FbD0fbb7",
+    "chainId": 133,
+=======
+    "addr": "0x1f0BC955E5f60dBD86A15cbe02b257D55b1bC8c1",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "MRD_PROXY_ADMIN"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0xE7A36CC7f4c973661a95Ce932288978325115605",
+    "chainId": 133,
+=======
+    "addr": "0x5F582c762BF581999F971a6D147996400eda7743",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "PRICE_FEED_ORACLE"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x08E4E33Db8F434f9b443CCada09E255a6F3CEaC4",
+    "chainId": 133,
+=======
+    "addr": "0x377a95C890b19575731199EeF2c9266355f845Ed",
+    "chainId": 31337,
+    "isContract": true,
+    "name": "ASSET_DEPLOYER"
+  },
+  {
+    "addr": "0xE6130a31b252F89e2B972a2304934C42FbD0fbb7",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "USDT"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x54edb22a897AB46C5A011a5b87650FAE546FA881",
+    "chainId": 133,
+=======
+    "addr": "0xBdD814542Fa279d4Ca65E5F7d8C37Df853A3008F",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "hUSDT"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x21556D99AB4584047905D74f60267b0f2D3dD9A3",
+    "chainId": 133,
+=======
+    "addr": "0x360d54966f0C299f16948748887DB2121AA49906",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "JUMP_RATE_IRM_USDT"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x22df3ffffECa90d5d44b9d10Bb5C32C7ff16A954",
+    "chainId": 133,
+=======
+    "addr": "0x4f1472a9FdA56c19ADbE146cDb5e123e851eF263",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "USDC"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0xF0975612DA3C44048189012DD14bf1153C2d6A03",
+    "chainId": 133,
+=======
+    "addr": "0x47E8Ff5C0d2Ad08450A155D44218628c4Fdb104f",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "hUSDC"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x01B3Af1F5a5a633702311197C5cC3114aC640b64",
+    "chainId": 133,
+=======
+    "addr": "0xC96AE21Aa500562a3837D360C9bCdc16ffB388e6",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "JUMP_RATE_IRM_USDC"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x76AD3Bb3d0F8DFDd024bA90e0474EbDfbED9E041",
+    "chainId": 133,
+=======
+    "addr": "0xE7A36CC7f4c973661a95Ce932288978325115605",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "WHSK"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0xd26c01Ea0AA52B24Ca7980e798A7313EDDf6bdd7",
+    "chainId": 133,
+=======
+    "addr": "0xFCDd6EBc28C8A1353a182FC27072f0f403b63110",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "hWHSK"
+  },
+  {
+<<<<<<< HEAD
+    "addr": "0x3d5a205A93EbA8B5d28d937d1cD3ab16317003eB",
+    "chainId": 133,
+=======
+    "addr": "0xBde1e4388B096dDe2d10AeBC866b266e795c2882",
+    "chainId": 31337,
+>>>>>>> ec0e50a (feat(protocol): Completion of the protocol contract development)
+    "isContract": true,
+    "name": "JUMP_RATE_IRM_WHSK"
+  }
+]
