@@ -96,16 +96,10 @@ contract CoreScript is Test, Script, Configuration {
         comptrollerProxy._setRewardDistributor(IMultiRewardDistributor(address(rewardDistributorProxy)));
         comptrollerProxy._setPriceOracle(PriceOracle(address(priceFeed)));
 
-        AssetDeployer assetDeployer = new AssetDeployer(
-            _admin,
-            _multisigWallet,
-            address(tErc20Delegate),
-            address(comptrollerProxy),
-            address(comptrollerProxy),
-            address(priceFeed)
-        );
+        AssetDeployer assetDeployer =
+            new AssetDeployer(_admin, _multisigWallet, address(comptrollerProxy), address(priceFeed));
 
-        addAddress("RTOKEN_IMPLEMENTATION", address(tErc20Delegate), block.chainid, true);
+        addAddress("HTOKEN_IMPLEMENTATION", address(tErc20Delegate), block.chainid, true);
         // addAddress("REWARD_TOKEN", address(rateToken), block.chainid, true);
         addAddress("UNITROLLER", address(unitroller), block.chainid, true);
         addAddress("COMPTROLLER", address(comptroller), block.chainid, true);
@@ -122,6 +116,7 @@ contract CoreScript is Test, Script, Configuration {
         AssetDeployer assetDeployer = AssetDeployer(getAddress("ASSET_DEPLOYER"));
         CompositeOracle priceFeed = CompositeOracle(getAddress("PRICE_FEED_ORACLE"));
         Unitroller unitroller = Unitroller(getAddress("UNITROLLER"));
+        address hTokenImplementation = getAddress("HTOKEN_IMPLEMENTATION");
         uint256 hTokenConfigsLength = hTokenConfigs.length;
 
         priceFeed.transferOwnership(address(assetDeployer));
@@ -146,8 +141,13 @@ contract CoreScript is Test, Script, Configuration {
 
             currentToken.approve(address(assetDeployer), ASSET_INITIAL_DEPOSIT);
 
+            address[] memory aggregators_ = new address[](1);
+            aggregators_[0] = config.chainlinkPriceFeed;
+
             address currentMarket = assetDeployer.deployAsset(
                 address(currentToken),
+                hTokenImplementation,
+                aggregators_,
                 config.name,
                 config.symbol,
                 currentToken.decimals(),
@@ -157,12 +157,12 @@ contract CoreScript is Test, Script, Configuration {
                 config.seizeShare,
                 config.supplyCap,
                 config.borrowCap,
-                config.chainlinkPriceFeed,
                 config.jrm.baseRatePerYear,
                 config.jrm.multiplierPerYear,
                 config.jrm.jumpMultiplierPerYear,
                 config.jrm.kink,
-                ASSET_INITIAL_DEPOSIT
+                ASSET_INITIAL_DEPOSIT,
+                true
             );
 
             (address interestModel,,) = assetDeployer.assets(address(currentToken));
@@ -269,7 +269,7 @@ contract CoreScript is Test, Script, Configuration {
             _symbol,
             underlyingAsset.decimals(),
             payable(deployer),
-            getAddress("RTOKEN_IMPLEMENTATION"),
+            getAddress("HTOKEN_IMPLEMENTATION"),
             ""
         );
     }
@@ -365,7 +365,7 @@ contract CoreScript is Test, Script, Configuration {
                 /// assert hToken delegate is uniform across contracts
                 assertEq(
                     address(HErc20Delegator(payable(address(hToken))).implementation()),
-                    getAddress("RTOKEN_IMPLEMENTATION")
+                    getAddress("HTOKEN_IMPLEMENTATION")
                 );
 
                 /// assert hToken initial exchange rate is correct

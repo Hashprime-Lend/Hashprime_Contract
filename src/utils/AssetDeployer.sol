@@ -4,6 +4,8 @@ pragma solidity 0.8.23;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "src/Comptroller.sol";
+
+import "@openzeppelin/contracts/access/Ownable.sol";
 import {HErc20Delegator} from "src/HErc20Delegator.sol";
 import {HToken} from "src/HToken.sol";
 import {JumpRateModel} from "src/irm/JumpRateModel.sol";
@@ -16,13 +18,8 @@ contract AssetDeployer is Ownable {
 
     error DeployAssetBalanceNotEnough(address asset, uint256 balance);
     error DeployAssetAllowanceNotEnough(address asset, uint256 allowance);
-
-    address public deployerAddress;
-    address public multisigWallet;
-    address public RTOKEN_IMPLEMENTATION;
-    CompositeOracle public oracle;
-    Comptroller public comptrollerProxy;
-    Unitroller public unitroller;
+    error MintCapMustGreaterThanInitialMintAmount();
+    error UnitrollerPendingAdminNotSetup();
 
     struct Market {
         address interestModel;
@@ -30,26 +27,41 @@ contract AssetDeployer is Ownable {
         address priceFeed;
     }
 
+    address public deployerAddress;
+    address public multisigWallet;
+    CompositeOracle public oracle;
+    Unitroller public unitroller;
+
     mapping(address => Market) public assets;
 
-    constructor(
-        address _deployerAddress,
-        address _multisigWallet,
-        address _HTOKEN_IMPLEMENTATION,
-        address _comptrollerProxy,
-        address _unitroller,
-        address _oracle
-    ) Ownable(_deployerAddress) {
+    // Event definitions
+    event AssetSetup(
+        address indexed underlyingAsset,
+        address indexed market,
+        uint8 decimals,
+        uint256 collateralFactor,
+        uint256 reserveFactor,
+        uint256 seizeShare,
+        uint256 supplyCap,
+        uint256 borrowCap,
+        uint256 initialMintAmount,
+        address aggregator,
+        bool paused
+    );
+
+    constructor(address _deployerAddress, address _multisigWallet, address _unitroller, address _oracle)
+        Ownable(_deployerAddress)
+    {
         deployerAddress = _deployerAddress;
         multisigWallet = _multisigWallet;
-        RTOKEN_IMPLEMENTATION = _HTOKEN_IMPLEMENTATION;
-        comptrollerProxy = Comptroller(_comptrollerProxy);
         unitroller = Unitroller(_unitroller);
         oracle = CompositeOracle(_oracle);
     }
 
     function deployAsset(
         address underlyingAsset,
+        address implementation,
+        address[] memory aggregators,
         string memory name,
         string memory symbol,
         uint8 decimals,
@@ -59,27 +71,37 @@ contract AssetDeployer is Ownable {
         uint256 seizeShare,
         uint256 supplyCap,
         uint256 borrowCap,
-        address chainlinkAggregator,
         uint256 baseRatePerYear,
         uint256 multiplierPerYear,
         uint256 jumpMultiplierPerYear,
         uint256 kink,
-        uint256 initialMintAmount
+        uint256 initialMintAmount,
+        bool pause
     ) public returns (address) {
-        // Use SafeERC20 for secure token transfers
         IERC20 token = IERC20(underlyingAsset);
         uint256 assetAllowance = token.allowance(msg.sender, address(this));
+        uint256 assetBalance = token.allowance(msg.sender, address(this));
+
+        if (unitroller.pendingAdmin() != address(this)) {
+            revert UnitrollerPendingAdminNotSetup();
+        }
 
         if (assetAllowance < initialMintAmount) {
             revert DeployAssetAllowanceNotEnough(underlyingAsset, assetAllowance);
         }
 
-        if (unitroller.admin() != address(this)) {
-            unitroller._acceptAdmin();
+        if (assetBalance < initialMintAmount) {
+            revert DeployAssetBalanceNotEnough(underlyingAsset, assetBalance);
         }
 
+        if (supplyCap < initialMintAmount) {
+            revert MintCapMustGreaterThanInitialMintAmount();
+        }
+
+        unitroller._acceptAdmin();
         token.safeTransferFrom(msg.sender, address(this), initialMintAmount);
 
+        Comptroller comptrollerProxy = Comptroller(address(unitroller));
         JumpRateModel interestRateModel =
             new JumpRateModel(baseRatePerYear, multiplierPerYear, jumpMultiplierPerYear, kink);
 
@@ -91,22 +113,17 @@ contract AssetDeployer is Ownable {
             name,
             symbol,
             decimals,
-            payable(deployerAddress),
-            RTOKEN_IMPLEMENTATION,
+            payable(address(this)),
+            implementation,
             ""
         );
 
         HToken hToken = HToken(address(newMarket));
 
-        EIP20Interface underlyingERC20 = EIP20Interface(underlyingAsset);
-
         // Configure Oracle
         oracle.setHTokenConfig(hToken, address(underlyingAsset), decimals);
-
-        address[] memory aggregators_ = new address[](1);
-        aggregators_[0] = chainlinkAggregator;
-
-        oracle.setOracle(hToken, aggregators_);
+        oracle.setOracle(hToken, aggregators);
+        oracle.setOracle(HToken(underlyingAsset), aggregators);
 
         comptrollerProxy._supportMarket(hToken);
 
@@ -123,19 +140,34 @@ contract AssetDeployer is Ownable {
         comptrollerProxy._setMarketSupplyCaps(hTokens, supplyCaps);
         comptrollerProxy._setMarketBorrowCaps(hTokens, borrowCaps);
 
-        underlyingERC20.approve(address(hToken), 1);
-        HErc20Delegator(payable(address(hToken))).mint(1);
-        hToken.approve(address(0), 1);
-        hToken.transfer(address(0), 1);
+        token.forceApprove(address(hToken), initialMintAmount);
+        HErc20Delegator(payable(address(hToken))).mint(initialMintAmount);
+        hToken.approve(address(0), initialMintAmount);
+        hToken.transfer(address(0), initialMintAmount);
 
-        comptrollerProxy._setBorrowPaused(hToken, true);
-        comptrollerProxy._setMintPaused(hToken, true);
+        assets[underlyingAsset] =
+            Market({interestModel: address(interestRateModel), market: address(newMarket), priceFeed: aggregators[0]});
 
-        assets[underlyingAsset] = Market({
-            interestModel: address(interestRateModel),
-            market: address(newMarket),
-            priceFeed: chainlinkAggregator
-        });
+        if (pause) {
+            comptrollerProxy._setBorrowPaused(hToken, true);
+            comptrollerProxy._setMintPaused(hToken, true);
+        }
+
+        hToken._setPendingAdmin(payable(multisigWallet));
+
+        emit AssetSetup(
+            underlyingAsset,
+            address(newMarket),
+            decimals,
+            collateralFactor,
+            reserveFactor,
+            seizeShare,
+            supplyCap,
+            borrowCap,
+            initialMintAmount,
+            aggregators[0],
+            pause
+        );
 
         return address(newMarket);
     }

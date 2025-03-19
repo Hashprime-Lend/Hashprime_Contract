@@ -89,19 +89,13 @@ contract CoreScript is Test, Script, Configuration {
         comptrollerProxy._setRewardDistributor(IMultiRewardDistributor(address(rewardDistributorProxy)));
         comptrollerProxy._setPriceOracle(PriceOracle(address(priceFeed)));
 
-        AssetDeployer assetDeployer = new AssetDeployer(
-            _admin,
-            _multisigWallet,
-            address(tErc20Delegate),
-            address(comptrollerProxy),
-            address(comptrollerProxy),
-            address(priceFeed)
-        );
+        AssetDeployer assetDeployer =
+            new AssetDeployer(_admin, _multisigWallet, address(comptrollerProxy), address(priceFeed));
 
         priceFeed.transferOwnership(address(assetDeployer));
         unitroller._setPendingAdmin(address(assetDeployer));
 
-        addAddress("RTOKEN_IMPLEMENTATION", address(tErc20Delegate), block.chainid, true);
+        addAddress("HTOKEN_IMPLEMENTATION", address(tErc20Delegate), block.chainid, true);
         addAddress("UNITROLLER", address(unitroller), block.chainid, true);
         addAddress("COMPTROLLER", address(comptroller), block.chainid, true);
         addAddress("MRD_PROXY", address(rewardDistributor), block.chainid, true);
@@ -115,16 +109,22 @@ contract CoreScript is Test, Script, Configuration {
         Configuration.RTokenConfiguration[] memory hTokenConfigs = getRTokenConfigurations(block.chainid);
         AssetDeployer assetDeployer = AssetDeployer(getAddress("ASSET_DEPLOYER"));
         Unitroller unitroller = Unitroller(getAddress("UNITROLLER"));
+        address hTokenImplementation = getAddress("HTOKEN_IMPLEMENTATION");
+
         uint256 hTokenConfigsLength = hTokenConfigs.length;
 
         //// create all of the hTokens according to the configuration in Config.sol
         for (uint256 i = 0; i < hTokenConfigsLength; i++) {
             Configuration.RTokenConfiguration memory config = hTokenConfigs[i];
+            address[] memory aggregators = new address[](1);
+            aggregators[0] = config.chainlinkPriceFeed;
 
             ERC20(config.tokenAddress).approve(address(assetDeployer), ASSET_INITIAL_DEPOSIT);
 
             address currentMarket = assetDeployer.deployAsset(
                 config.tokenAddress,
+                hTokenImplementation,
+                aggregators,
                 config.name,
                 config.symbol,
                 ERC20(config.tokenAddress).decimals(),
@@ -134,12 +134,12 @@ contract CoreScript is Test, Script, Configuration {
                 config.seizeShare,
                 config.supplyCap,
                 config.borrowCap,
-                config.chainlinkPriceFeed,
                 config.jrm.baseRatePerYear,
                 config.jrm.multiplierPerYear,
                 config.jrm.jumpMultiplierPerYear,
                 config.jrm.kink,
-                ASSET_INITIAL_DEPOSIT
+                ASSET_INITIAL_DEPOSIT,
+                true
             );
 
             (address interestModel,,) = assetDeployer.assets(config.tokenAddress);
@@ -241,7 +241,7 @@ contract CoreScript is Test, Script, Configuration {
                 /// assert hToken delegate is uniform across contracts
                 assertEq(
                     address(HErc20Delegator(payable(address(hToken))).implementation()),
-                    getAddress("RTOKEN_IMPLEMENTATION")
+                    getAddress("HTOKEN_IMPLEMENTATION")
                 );
 
                 /// assert hToken initial exchange rate is correct
@@ -361,7 +361,7 @@ contract CoreScript is Test, Script, Configuration {
             _symbol,
             underlyingAsset.decimals(),
             payable(deployer),
-            getAddress("RTOKEN_IMPLEMENTATION"),
+            getAddress("HTOKEN_IMPLEMENTATION"),
             ""
         );
     }

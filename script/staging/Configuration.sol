@@ -113,9 +113,7 @@ contract Configuration is Test, Script, Addresses {
 
     function setupHtokenList() public {
         MockChainlinkAggregator usdAssetAggregator = new MockChainlinkAggregator(1.0e6, 6);
-        MockChainlinkAggregator fastUSDAggregator = new MockChainlinkAggregator(1e18, 18);
-        MockChainlinkAggregator iseiPriceFeed = new MockChainlinkAggregator(0.6969e18, 18);
-        MockChainlinkAggregator wseiPriceFeed = new MockChainlinkAggregator(0.6969e18, 18);
+        MockChainlinkAggregator whskPriceFeed = new MockChainlinkAggregator(0.6969e18, 18);
 
         // 对于 HashPrime USDT 的配置
         hTokenConfigurations[block.chainid].push(
@@ -175,7 +173,7 @@ contract Configuration is Test, Script, Addresses {
                 decimal: 18,
                 price: 0.5 ether,
                 tokenAddress: address(0),
-                chainlinkPriceFeed: address(wseiPriceFeed),
+                chainlinkPriceFeed: address(whskPriceFeed),
                 initialMintAmount: 1,
                 collateralFactor: 0.7e18,
                 reserveFactor: 0.3e18,
