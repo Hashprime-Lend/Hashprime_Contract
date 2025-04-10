@@ -16,7 +16,6 @@ import {Configuration} from "./Configuration.sol";
 import {MockChainlinkOracle} from "src/mock/oracle/MockChainlinkOracle.sol";
 import {FaucetTokenWithPermit} from "src/mock/token/FaucetToken.sol";
 import {Comptroller, Unitroller, ComptrollerInterface} from "src/Comptroller.sol";
-// import {Rate} from "src/Rate.sol";
 import {PriceOracle} from "src/oracles/PriceOracle.sol";
 import {HErc20Delegate} from "src/HErc20Delegate.sol";
 import {ChainlinkPriceFeed} from "src/mock/oracle/ChainlinkPriceFeed.sol";
