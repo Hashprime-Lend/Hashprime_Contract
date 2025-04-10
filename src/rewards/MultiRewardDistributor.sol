@@ -992,5 +992,5 @@ contract MultiRewardDistributor is
         }
     }
 
-    function _authorizeUpgrade(address newImplementation) internal virtual override {}
+    function _authorizeUpgrade(address newImplementation) internal virtual override onlyOwner {}
 }
