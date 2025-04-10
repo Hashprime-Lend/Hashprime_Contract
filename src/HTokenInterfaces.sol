@@ -83,7 +83,7 @@ contract HTokenStorage {
 
 abstract contract HTokenInterface is HTokenStorage {
     /// @notice Indicator that this is a HToken contract (for inspection)
-    bool public constant isRToken = true;
+    bool public constant isHToken = true;
 
     /**
      * Market Events **

@@ -893,7 +893,7 @@ contract Comptroller is ComptrollerVXStorage, ComptrollerInterface, ComptrollerE
             return fail(Error.MARKET_ALREADY_LISTED, FailureInfo.SUPPORT_MARKET_EXISTS);
         }
 
-        require(hToken.isRToken(), "Must be an HToken"); // Sanity check to make sure its really a HToken
+        require(hToken.isHToken(), "Must be an HToken"); // Sanity check to make sure its really a HToken
 
         Market storage newMarket = markets[address(hToken)];
         newMarket.isListed = true;
