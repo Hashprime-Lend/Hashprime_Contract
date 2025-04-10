@@ -15,7 +15,6 @@ contract MarketState {
         uint256 totalBorrows;
         uint256 supplyRatePerBlock;
         uint256 borrowRatePerBlock;
-        uint256 blocksPerYear;
         uint256 timestampsPerYear;
         address token;
         address underlying;
@@ -54,7 +53,6 @@ contract MarketState {
                 uint256 price = oracle.getPrice(rToken);
                 string memory underlyingSymbol;
                 EIP20Interface underlying = EIP20Interface(underlying_addr);
-                uint256 blocksPerYear;
                 uint256 timestampsPerYear;
 
                 uint256 decimals = uint256(underlying.decimals());
@@ -73,7 +71,6 @@ contract MarketState {
                     tvl: tvl,
                     totalSupply: totalSupply,
                     totalBorrows: totalBorrows,
-                    blocksPerYear: blocksPerYear,
                     timestampsPerYear: timestampsPerYear,
                     supplyRatePerBlock: supplyRatePerBlock,
                     borrowRatePerBlock: borrowRatePerBlock,
