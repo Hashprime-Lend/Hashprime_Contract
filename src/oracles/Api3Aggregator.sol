@@ -5,8 +5,12 @@ import {IProxy} from "src/interface/IProxy.sol";
 import {AggregatorV3Interface} from "src/oracles/AggregatorV3Interface.sol";
 
 contract Api3Aggregator is AggregatorV3Interface {
+    uint256 public freshCheck = 12 * 3600;
+
     IProxy public originPriceFeed;
     string public description;
+
+    error PriceInvalid();
 
     /**
      * Constructor accepts two addresses:
@@ -30,7 +34,12 @@ contract Api3Aggregator is AggregatorV3Interface {
         (int224 value, uint32 timestamp) = originPriceFeed.read();
         uint256 updatedAt_ = uint256(timestamp);
         int256 scaledTokenPrice = int256(int224(uint224(value)));
-        return (uint80(1), scaledTokenPrice, updatedAt_, block.timestamp - updatedAt_, uint80(0));
+
+        if (block.timestamp - updatedAt_ > freshCheck) {
+            revert PriceInvalid();
+        }
+
+        return (uint80(1), scaledTokenPrice, 0, updatedAt_, uint80(0));
     }
 
     function version() public pure override returns (uint256) {
