@@ -25,11 +25,6 @@ contract HTokenStorage {
     // @notice Maximum fraction of interest that can be set aside for reserves
     uint256 internal constant reserveFactorMaxMantissa = 1e18;
 
-    // @notice Maximum fraction of redemption factor that can be set aside for reserves
-    uint256 internal constant redemptionReserveFactorMaxMantissa = 0.05 ether;
-
-    uint256 internal constant minRedemptionCashRequire = 1 wei;
-
     /// @notice Administrator for this contract
     address payable public admin;
 
